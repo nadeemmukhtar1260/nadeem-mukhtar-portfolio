@@ -1,0 +1,263 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Palette (HSL channels, consumed by tailwind.config.ts).
+ * Dark is the default; the `.light` class on <html> switches to light.
+ *   background #0B0F10 · card/surface #12181A · raised #182124 · line #243236
+ *   text #E9EFEF · muted #9BAAAC · accent #2DD4BF · on-accent #04211D
+ */
+@layer base {
+  :root {
+    color-scheme: dark;
+    --background: 192 18.5% 5.3%;
+    --foreground: 180 15.8% 92.5%;
+    --card: 195 18.2% 8.6%;
+    --card-foreground: 180 15.8% 92.5%;
+    --popover: 195 18.2% 8.6%;
+    --popover-foreground: 180 15.8% 92.5%;
+    --primary: 180 15.8% 92.5%;
+    --primary-foreground: 192 18.5% 5.3%;
+    --secondary: 195 20% 11.8%;
+    --secondary-foreground: 180 15.8% 92.5%;
+    --muted: 195 20% 11.8%;
+    --muted-foreground: 187.1 9.3% 64.1%;
+    --accent: 172.5 66% 50.4%;
+    --accent-foreground: 171.7 78.4% 7.3%;
+    --destructive: 0 72% 62%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 193.3 20% 17.6%;
+    --input: 193.3 20% 17.6%;
+    --ring: 172.5 66% 50.4%;
+    --radius: 0.625rem;
+  }
+
+  .light {
+    color-scheme: light;
+    --background: 180 11.1% 96.5%;
+    --foreground: 186.7 24.3% 7.3%;
+    --card: 0 0% 100%;
+    --card-foreground: 186.7 24.3% 7.3%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 186.7 24.3% 7.3%;
+    --primary: 186.7 24.3% 7.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 13.3% 94.1%;
+    --secondary-foreground: 186.7 24.3% 7.3%;
+    --muted: 180 13.3% 94.1%;
+    --muted-foreground: 187.1 10.1% 33.1%;
+    --accent: 175.3 77.4% 26.1%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 42%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 186 12.8% 84.7%;
+    --input: 186 12.8% 84.7%;
+    --ring: 175.3 77.4% 26.1%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  section[id] {
+    scroll-margin-top: 64px;
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: 3px;
+  }
+  @media (min-width: 1024px) {
+    body {
+      font-size: 17px;
+    }
+    section[id] {
+      scroll-margin-top: 72px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    * {
+      transition: none !important;
+    }
+  }
+}
+
+/* Chat assistant: launcher fade-in, icon swap, panel open/close, typing dots. */
+@keyframes chat-launcher-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+@keyframes chat-icon-in {
+  from {
+    opacity: 0;
+    transform: rotate(var(--chat-icon-from, 90deg));
+  }
+}
+@keyframes chat-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+@keyframes chat-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.chat-launcher {
+  animation: chat-launcher-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+}
+.chat-icon {
+  display: inline-flex;
+  animation: chat-icon-in 0.2s ease-out both;
+}
+.chat-panel[data-open="true"] {
+  animation: chat-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.chat-panel[data-open="false"] {
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0.3s;
+}
+.chat-dot {
+  animation: chat-dot 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-launcher,
+  .chat-icon,
+  .chat-panel[data-open="true"],
+  .chat-dot {
+    animation: none;
+  }
+}
+
+/* Keyboard-only link to jump past the header; invisible until focused. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -100px;
+  z-index: 50;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    overflow-x: auto;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
+@layer components {
+  .label {
+    @apply font-mono uppercase text-muted-foreground;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+  .tag {
+    @apply whitespace-nowrap rounded-md border border-border font-mono text-muted-foreground;
+    font-size: 12px;
+    padding: 5px 9px;
+  }
+  .navlink {
+    @apply inline-flex min-h-11 items-center rounded-lg px-3.5 text-[15px] text-muted-foreground transition-colors hover:text-foreground;
+  }
+  .btn {
+    @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-[10px] border border-transparent px-[22px] text-base font-semibold;
+    transition: filter 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .btn-primary {
+    @apply bg-accent text-accent-foreground;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.1);
+  }
+  .btn-secondary {
+    @apply border-border bg-transparent text-foreground hover:border-accent;
+  }
+  .iconbtn {
+    @apply inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-[10px] border border-border bg-transparent text-foreground transition-colors hover:border-accent;
+  }
+  .card {
+    @apply rounded-[14px] border border-border bg-card;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card-hover:hover {
+    @apply border-accent;
+    transform: translateY(-3px);
+  }
+  .link {
+    @apply inline-flex min-h-11 items-center text-[15px] font-semibold text-accent underline-offset-4 hover:underline;
+  }
+  .marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+  .section {
+    @apply border-t border-border py-14;
+  }
+  .section-title {
+    @apply text-[30px] font-semibold leading-[1.15] tracking-[-0.02em];
+    text-wrap: balance;
+  }
+  @media (min-width: 1024px) {
+    .label,
+    .tag {
+      font-size: 12.5px;
+    }
+    .tag {
+      padding: 5px 10px;
+    }
+    .card {
+      @apply rounded-2xl;
+    }
+    .section {
+      @apply py-24;
+    }
+    .section-title {
+      @apply text-[40px];
+    }
+  }
+}
