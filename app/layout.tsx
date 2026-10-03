@@ -37,8 +37,10 @@ export const viewport: Viewport = {
   themeColor: "#0B0F10",
 }
 
-// Runs before paint so a saved light preference never flashes dark.
-const themeScript = `try{if(localStorage.getItem("theme")==="light")document.documentElement.classList.add("light")}catch(e){}`
+// Runs before paint so a saved light preference never flashes dark, and so the
+// landing-page intro (components/page-loader.tsx) is skipped on repeat visits in
+// the same session, when the visit starts on another page, and under reduced motion.
+const themeScript = `try{var d=document.documentElement;if(localStorage.getItem("theme")==="light")d.classList.add("light");if(location.pathname!=="/"||sessionStorage.getItem("intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("loader-skip")}catch(e){}`
 
 export default function RootLayout({
   children,
@@ -57,6 +59,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${sans.variable} ${mono.variable} font-sans antialiased`}>
+        <div className="site-dots" aria-hidden="true" />
         <a href="#top" className="skip-link">
           {seo.skipLink}
         </a>

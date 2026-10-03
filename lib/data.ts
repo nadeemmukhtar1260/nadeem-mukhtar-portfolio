@@ -312,6 +312,17 @@ export const callTrace = [
   32, 14, 22, 36, 26, 12, 18, 10,
 ]
 
+/**
+ * Text inside the decorative field animations (components/field-fx.tsx).
+ * The CSS timing in app/globals.css assumes five trace steps and a
+ * 15-character request; change those there if these change.
+ */
+export const fieldFx = {
+  traceSteps: ["listen", "transcribe", "reason", "act", "speak"],
+  request: "GET /api/orders",
+  response: "200 OK",
+}
+
 export interface Service {
   slug: string
   category: string

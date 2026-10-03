@@ -1,5 +1,6 @@
 import Image from "next/image"
 
+import { CallTrace } from "@/components/field-fx"
 import { callTrace, profile } from "@/lib/data"
 
 const TRACE_MAX = 72
@@ -10,7 +11,7 @@ export function Hero() {
       aria-label="Introduction"
       className="flex flex-col gap-10 pb-16 pt-12 lg:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-center lg:gap-[72px] lg:pb-28 lg:pt-[104px]"
     >
-      <div className="flex flex-col gap-5 lg:gap-7">
+      <div className="load-seq flex flex-col gap-5 lg:gap-7">
         <span className="label !text-accent">{profile.role}</span>
         <h1 className="text-[44px] font-semibold leading-[1.05] tracking-[-0.025em] lg:text-[68px] lg:leading-[1.04]">
           {profile.name}
@@ -27,7 +28,7 @@ export function Hero() {
         </div>
       </div>
 
-      <figure className="m-0 flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 lg:gap-5 lg:rounded-[20px] lg:p-5">
+      <figure className="load-in m-0 flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 lg:gap-5 lg:rounded-[20px] lg:p-5">
         <Image
           src={profile.portrait.src}
           alt={profile.portrait.alt}
@@ -48,11 +49,12 @@ export function Hero() {
           {callTrace.map((height, i) => (
             <div
               key={i}
-              className="w-[3px] rounded-sm bg-accent lg:w-1"
+              className="fx-bar w-[3px] rounded-sm bg-accent lg:w-1"
               style={{ height: `${(height / TRACE_MAX) * 100}%` }}
             />
           ))}
         </div>
+        <CallTrace />
       </figure>
     </section>
   )

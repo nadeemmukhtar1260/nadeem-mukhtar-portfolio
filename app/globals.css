@@ -261,3 +261,715 @@
     }
   }
 }
+
+/*
+ * Field animations (components/field-fx.tsx, components/timeline.tsx).
+ * One small decorative element per field: 1 call trace (hero, 6s), 2 node graph
+ * (AI Call Agent card, 5s), 3 request line (Backend, 7s), 4 database (Data and
+ * cloud, 6s), 5 browser window (Frontend, 6s), 6 timeline draw (Experience, once),
+ * 7 signal arcs (Email me button, 4s). Palette tokens only, 1.5px rounded strokes.
+ * The base styles are the static frame; reduced motion switches every animation off.
+ */
+.fx {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.fx svg {
+  display: block;
+  overflow: visible;
+}
+.fx-ln {
+  fill: none;
+  stroke: hsl(var(--muted-foreground));
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fx-fill {
+  fill: hsl(var(--accent));
+  fill-opacity: 0.4;
+}
+.fx-side {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Hero waveform bars */
+.fx-bar {
+  transform-origin: center;
+  animation: fx-wave 2.4s ease-in-out infinite alternate;
+}
+.fx-bar:nth-child(3n) {
+  animation-delay: -0.8s;
+}
+.fx-bar:nth-child(3n + 1) {
+  animation-delay: -1.6s;
+}
+.fx-bar:nth-child(4n) {
+  animation-duration: 3.1s;
+}
+@keyframes fx-wave {
+  from {
+    transform: scaleY(0.55);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* 1. Call trace. The dot crosses one tick per second; label delays follow it. */
+.trace {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trace-rail {
+  position: relative;
+  overflow: hidden;
+  height: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  justify-items: center;
+  align-items: center;
+}
+.trace-rail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 1px;
+  background: hsl(var(--border));
+}
+.trace-tick {
+  position: relative;
+  width: 1.5px;
+  height: 10px;
+  border-radius: 1px;
+  background: hsl(var(--muted-foreground));
+  opacity: 0.6;
+}
+.trace-run {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0;
+  transform: translateX(10%);
+  animation: fx-trace-run 6s linear infinite;
+}
+.trace-dot {
+  position: absolute;
+  left: -3.5px;
+  top: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: hsl(var(--accent));
+}
+.trace-labels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  justify-items: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  color: hsl(var(--muted-foreground));
+}
+.trace-labels span {
+  animation: fx-trace-lit 6s ease-in-out infinite both;
+}
+.trace-labels span:nth-child(1) {
+  color: hsl(var(--accent));
+  animation-delay: 0.32s;
+}
+.trace-labels span:nth-child(2) {
+  animation-delay: 1.32s;
+}
+.trace-labels span:nth-child(3) {
+  animation-delay: 2.32s;
+}
+.trace-labels span:nth-child(4) {
+  animation-delay: 3.32s;
+}
+.trace-labels span:nth-child(5) {
+  animation-delay: 4.32s;
+}
+@media (max-width: 359px) {
+  .trace-labels {
+    font-size: 9px;
+  }
+}
+@media (min-width: 1024px) {
+  .trace-labels {
+    font-size: 10.5px;
+  }
+}
+@keyframes fx-trace-run {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  4%,
+  79% {
+    opacity: 1;
+  }
+  83.33%,
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+@keyframes fx-trace-lit {
+  0% {
+    color: hsl(var(--muted-foreground));
+  }
+  3%,
+  15% {
+    color: hsl(var(--accent));
+  }
+  22%,
+  100% {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+/* 2. Node graph */
+.fx-graph {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 72px;
+  height: 72px;
+}
+.fx-node {
+  fill: hsl(var(--card));
+  stroke: hsl(var(--muted-foreground));
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
+  animation: fx-glow 5s ease-in-out infinite both;
+}
+.fx-hub {
+  fill: hsl(var(--card));
+  stroke: hsl(var(--accent));
+  stroke-width: 1.5;
+}
+.fx-pulse {
+  fill: hsl(var(--accent));
+  opacity: 0;
+  animation: fx-pulse 5s ease-in-out infinite both;
+}
+.fx-p1 {
+  --dx: 0px;
+  --dy: -26px;
+}
+.fx-p2 {
+  --dx: 23px;
+  --dy: 18px;
+}
+.fx-p3 {
+  --dx: -23px;
+  --dy: 18px;
+}
+.fx-p2,
+.fx-n2 {
+  animation-delay: 1.667s;
+}
+.fx-p3,
+.fx-n3 {
+  animation-delay: 3.333s;
+}
+@keyframes fx-pulse {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  14%,
+  19% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 1;
+  }
+  30% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  33%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+}
+@keyframes fx-glow {
+  0%,
+  12% {
+    fill: hsl(var(--card));
+    stroke: hsl(var(--muted-foreground));
+    stroke-opacity: 0.55;
+  }
+  16%,
+  21% {
+    fill: hsl(var(--accent));
+    stroke: hsl(var(--accent));
+    stroke-opacity: 1;
+  }
+  30%,
+  100% {
+    fill: hsl(var(--card));
+    stroke: hsl(var(--muted-foreground));
+    stroke-opacity: 0.55;
+  }
+}
+
+/* 3. Request line. Widths are in ch: 15 typed characters, then arrow + response. */
+.fx-req {
+  display: flex;
+  align-items: center;
+  width: 25ch;
+  white-space: pre;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  line-height: 1;
+  color: hsl(var(--muted-foreground));
+}
+/* Four skill columns are too narrow for it between 1024 and 1119px. */
+@media (min-width: 1024px) and (max-width: 1119px) {
+  .fx-req {
+    display: none;
+  }
+}
+.fx-req-txt {
+  display: inline-flex;
+  animation: fx-req-fade 7s ease-in-out infinite;
+}
+.fx-req-type {
+  display: inline-block;
+  overflow: hidden;
+  width: 15ch;
+  animation: fx-req-type 7s infinite;
+}
+.fx-req-res {
+  display: inline-block;
+  overflow: hidden;
+  width: 9.5ch;
+  animation: fx-req-res 7s infinite;
+}
+.fx-req-ok {
+  color: hsl(var(--accent));
+}
+.fx .fx-arrow {
+  display: inline-block;
+  width: 2ch;
+  height: 1em;
+  margin-left: 0.5ch;
+  vertical-align: -0.12em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fx-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.2em;
+  margin-left: 2px;
+  border-radius: 1px;
+  background: hsl(var(--muted-foreground));
+  animation: fx-caret 2s step-end infinite;
+}
+@keyframes fx-req-type {
+  0% {
+    width: 0;
+    animation-timing-function: step-end;
+  }
+  8% {
+    width: 0;
+    animation-timing-function: steps(15, end);
+  }
+  40% {
+    width: 15ch;
+    animation-timing-function: step-end;
+  }
+  94%,
+  100% {
+    width: 0;
+  }
+}
+@keyframes fx-req-res {
+  0% {
+    width: 0;
+    opacity: 0;
+    animation-timing-function: step-end;
+  }
+  54% {
+    width: 9.5ch;
+    opacity: 0;
+    animation-timing-function: ease-in-out;
+  }
+  62% {
+    width: 9.5ch;
+    opacity: 1;
+    animation-timing-function: step-end;
+  }
+  94%,
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
+@keyframes fx-req-fade {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  92%,
+  95% {
+    opacity: 0;
+  }
+  96%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fx-caret {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 4 and 5. Database layers and browser blocks appear one after another. */
+.fx-s1 {
+  animation: fx-step-1 6s ease-in-out infinite;
+}
+.fx-s2 {
+  animation: fx-step-2 6s ease-in-out infinite;
+}
+.fx-s3 {
+  animation: fx-step-3 6s ease-in-out infinite;
+}
+@keyframes fx-step-1 {
+  0% {
+    opacity: 0;
+  }
+  14%,
+  74% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fx-step-2 {
+  0%,
+  17% {
+    opacity: 0;
+  }
+  31%,
+  74% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fx-step-3 {
+  0%,
+  34% {
+    opacity: 0;
+  }
+  48%,
+  74% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 6. Experience timeline. .tl-wait / .tl-in are set by components/timeline.tsx. */
+.tl::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: hsl(var(--border));
+  transform-origin: top;
+}
+.tl-wait::before {
+  transform: scaleY(0);
+}
+.tl-wait .tl-dot {
+  background: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+.tl-in::before {
+  animation: fx-tl-draw 3.2s ease-in-out both;
+}
+.tl-in .tl-dot {
+  animation: fx-tl-dot 0.6s ease-in-out both;
+}
+@keyframes fx-tl-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes fx-tl-dot {
+  from {
+    background: hsl(var(--background));
+    border-color: hsl(var(--border));
+  }
+  to {
+    background: hsl(var(--accent));
+    border-color: hsl(var(--accent));
+  }
+}
+
+/* 7. Signal arcs on the Email me icon */
+.fx-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  overflow: visible;
+}
+.fx-ring path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.3;
+  transform-origin: 4px 6px;
+  animation: fx-arc 4s ease-in-out infinite both;
+}
+.fx-ring path + path {
+  animation-delay: 0.5s;
+}
+@keyframes fx-arc {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  12% {
+    opacity: 0.5;
+  }
+  40%,
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx,
+  .fx *,
+  .fx-bar,
+  .tl::before,
+  .tl .tl-dot {
+    animation: none !important;
+  }
+  .tl-wait::before {
+    transform: none;
+  }
+  .tl-wait .tl-dot {
+    background: hsl(var(--accent));
+    border-color: hsl(var(--accent));
+  }
+}
+
+/*
+ * Site-wide animated points: a faint dot grid behind every page (app/layout.tsx),
+ * drifting slowly, with a sparse set of teal points that breathe in and out.
+ */
+.site-dots {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.site-dots::before,
+.site-dots::after {
+  content: "";
+  position: absolute;
+  inset: -160px;
+}
+.site-dots::before {
+  background-image: radial-gradient(hsl(var(--border)) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  animation: fx-dots-drift 24s linear infinite;
+}
+.site-dots::after {
+  background-image: radial-gradient(hsl(var(--accent)) 1.4px, transparent 1.6px);
+  background-size: 160px 160px;
+  opacity: 0.35;
+  animation: fx-dots-drift-wide 120s linear infinite, fx-dots-breathe 6s ease-in-out infinite alternate;
+}
+@keyframes fx-dots-drift {
+  to {
+    transform: translate(32px, 32px);
+  }
+}
+@keyframes fx-dots-drift-wide {
+  to {
+    transform: translate(160px, 160px);
+  }
+}
+@keyframes fx-dots-breathe {
+  from {
+    opacity: 0.08;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+
+/* Page load: the intro of each page fades up, one line after another. */
+.load-seq > *,
+.load-in {
+  animation: fx-load-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.load-seq > :nth-child(1) {
+  animation-delay: 0.05s;
+}
+.load-seq > :nth-child(2) {
+  animation-delay: 0.13s;
+}
+.load-seq > :nth-child(3) {
+  animation-delay: 0.21s;
+}
+.load-seq > :nth-child(4) {
+  animation-delay: 0.29s;
+}
+.load-seq > :nth-child(5) {
+  animation-delay: 0.37s;
+}
+.load-seq > :nth-child(n + 6) {
+  animation-delay: 0.45s;
+}
+.load-in {
+  animation-delay: 0.3s;
+}
+@keyframes fx-load-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-dots::before,
+  .site-dots::after,
+  .load-seq > *,
+  .load-in {
+    animation: none;
+  }
+}
+
+/*
+ * Landing-page intro (components/page-loader.tsx). JavaScript drives the mark,
+ * bar and counter; these rules are the look, the exit, and a failsafe that
+ * removes the cover after 5s if the script never runs.
+ */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--background));
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1), visibility 0s linear 0.7s;
+  animation: loader-failsafe 0.4s ease 5s forwards;
+}
+.loader-skip .page-loader {
+  display: none;
+}
+.page-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  transition: opacity 0.3s ease, transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.page-loader-track,
+.page-loader-mark {
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.page-loader-track {
+  stroke: hsl(var(--border));
+}
+.page-loader-mark {
+  stroke: hsl(var(--accent));
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.page-loader-bar {
+  width: 160px;
+  height: 2px;
+  border-radius: 1px;
+  overflow: hidden;
+  background: hsl(var(--border));
+}
+.page-loader-bar span {
+  display: block;
+  height: 100%;
+  background: hsl(var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.page-loader-count {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+}
+.page-loader.is-leaving {
+  transform: translateY(-100%);
+  visibility: hidden;
+  animation: none;
+}
+.page-loader.is-leaving .page-loader-inner {
+  opacity: 0;
+  transform: translateY(40px);
+}
+@keyframes loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+/* When the cover lifts, the hero's load-in plays again from the start. */
+.loader-done .load-seq > *,
+.loader-done .load-in {
+  animation-name: fx-load-in-again;
+}
+@keyframes fx-load-in-again {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}

@@ -1,3 +1,4 @@
+import { PageLoader } from "@/components/page-loader"
 import { Header } from "@/components/header"
 import { ClientStrip } from "@/components/client-strip"
 import { Hero } from "@/components/sections/hero"
@@ -12,6 +13,7 @@ import { ChatWidget } from "@/components/chat-widget"
 export default function Home() {
   return (
     <>
+      <PageLoader />
       <Header />
       <ClientStrip />
       <main id="top" tabIndex={-1} className="mx-auto max-w-[1120px] px-5 focus:outline-none lg:px-8">

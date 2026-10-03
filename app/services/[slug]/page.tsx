@@ -53,7 +53,7 @@ export default function ServicePage({ params }: Params) {
       <main id="top" tabIndex={-1} className="mx-auto max-w-[1120px] px-5 focus:outline-none lg:px-8">
         <section
           aria-label="Introduction"
-          className="flex flex-col gap-5 pb-16 pt-12 lg:gap-7 lg:pb-28 lg:pt-[104px]"
+          className="load-seq flex flex-col gap-5 pb-16 pt-12 lg:gap-7 lg:pb-28 lg:pt-[104px]"
         >
           <div className="flex flex-wrap items-center gap-3">
             <span className="label !text-accent">{service.category}</span>

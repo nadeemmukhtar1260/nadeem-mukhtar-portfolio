@@ -1,5 +1,15 @@
+import type { ReactNode } from "react"
+
+import { BrowserFx, DatabaseFx, RequestLine } from "@/components/field-fx"
 import { skills } from "@/lib/data"
 import { SectionHeading } from "@/components/section-heading"
+
+/** Decorative animation beside a skill heading, by category. Database and browser are desktop only. */
+const categoryFx: Record<string, ReactNode> = {
+  Backend: <RequestLine />,
+  "Data and cloud": <DatabaseFx className="hidden lg:block" />,
+  "Frontend and tools": <BrowserFx className="hidden lg:block" />,
+}
 
 export function Skills() {
   return (
@@ -13,7 +23,10 @@ export function Skills() {
               group.primary ? "border-accent" : "border-border"
             }`}
           >
-            <h3 className="text-[17px] font-semibold lg:text-lg">{group.category}</h3>
+            <div className="relative">
+              <h3 className="text-[17px] font-semibold lg:text-lg">{group.category}</h3>
+              {categoryFx[group.category]}
+            </div>
             <div className="flex flex-wrap gap-2">
               {group.items.map((item) => (
                 <span key={item} className="tag">
